@@ -25,7 +25,7 @@ def getGoogleSearchResult(phrase):
 		ucPrint(result.title)
 		if "AZLyrics" in result.title:
 			return response.results[i].getText()
-		if i > 7:
+		if i > 10:
 			break
 		i = i + 1
 	print "No lyrics were found"
@@ -38,7 +38,6 @@ def getSongName(windowName):
 	a = windowName.split(' - ')
 	return a[1].rstrip()
 
-	
 def getSongLyrics_AZLyrics(content, wName):
 	lirycs = []
 	title = "\""+getSongName(wName)+"\""
@@ -50,14 +49,12 @@ def getSongLyrics_AZLyrics(content, wName):
 			break;
 		if startFound and not re.match(r'^\s*$', line):
 			lirycs.append(line)
-		if title in line:
+		if re.search(title, line, re.IGNORECASE):
 			#print "1st", line 
 			if "lyrics" not in line:
 				#print "2st", line 
 				startFound = True
 	return lirycs
-	
-
 	
 
 if __name__ == "__main__":
@@ -72,10 +69,11 @@ if __name__ == "__main__":
 				print wName
 				content = getGoogleSearchResult(wName)
 				#ucPrint(content)
-				print 
-				lirycs = getSongLyrics_AZLyrics(content, wName)
-				for ln in lirycs:
-					print ln
+				if content:
+					print 
+					lirycs = getSongLyrics_AZLyrics(content, wName)
+					for ln in lirycs:
+						print ln
 				print 
 			lastName = wName
 		time.sleep(5)
