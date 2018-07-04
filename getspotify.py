@@ -1,6 +1,9 @@
 import enumProc
 import re
-import time 
+import time
+import sys
+from googlesearch.googlesearch import GoogleSearch
+from myprints import *
 
 def getSpotifyWindowName():
 	pids = enumProc.search('Spotify.exe')
@@ -10,13 +13,23 @@ def getSpotifyWindowName():
 	name = re.sub('- Live$', '', name)
 	name = re.sub('- Edit$', '', name)
 	name = re.sub('- edit$', '', name)
+	name = re.sub('on Vimeo', '', name)
 	return name
 
-def getGoogleSearchResult(phrase):		
-	from googlesearch.googlesearch import GoogleSearch
+def getGoogleSearchResult(phrase):	
+	ucPrint("Google search phrase: "+phrase)	
 	response = GoogleSearch().search(phrase)
-	#print response.results[0].title
-	return response.results[0].getText()
+	i = 0 
+	print("Results:")
+	for result in response.results:
+		ucPrint(result.title)
+		if "AZLyrics" in result.title:
+			return response.results[i].getText()
+		if i > 7:
+			break
+		i = i + 1
+	print "No lyrics were found"
+	return None
 
 def getLine(text):
 	return iter(text.splitlines())
@@ -26,7 +39,7 @@ def getSongName(windowName):
 	return a[1].rstrip()
 
 	
-def getSongLirycs(content, wName):
+def getSongLyrics_AZLyrics(content, wName):
 	lirycs = []
 	title = "\""+getSongName(wName)+"\""
 	#print title
@@ -57,10 +70,12 @@ if __name__ == "__main__":
 			else:
 				print 
 				print wName
-				content = getGoogleSearchResult(wName)	
+				content = getGoogleSearchResult(wName)
+				#ucPrint(content)
 				print 
-				lirycs = getSongLirycs(content, wName)
+				lirycs = getSongLyrics_AZLyrics(content, wName)
 				for ln in lirycs:
 					print ln
+				print 
 			lastName = wName
 		time.sleep(5)

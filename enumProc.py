@@ -1,3 +1,4 @@
+
 import sys
 import os
 import traceback
@@ -7,6 +8,11 @@ import win32con
 import win32api
 import win32gui
 import win32process
+
+#
+# Used source code posted by CristiFati 
+# https://stackoverflow.com/questions/31278590/get-the-title-of-a-window-of-another-program-using-the-process-name
+#
 
 title = None
 
