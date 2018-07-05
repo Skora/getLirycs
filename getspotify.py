@@ -65,8 +65,31 @@ def getSongLyrics_Tekstowo (content, wName):
 			startFound = True
 	return lirycs
 
+def getSongLyrics_Genius (content, wName):
+	lirycs = []
+	beginPhrase = getSongName(wName)+ ".*" + "Lyrics" 
+	#ucPrint("bgP: " + beginPhrase)
+	phFound = False
+	startFound = False
+	for line in getLine(content):
+		#ucPrint(line)
+		if "More on Genius" in line:
+			#print "Found: More on Genius"
+			break;
+		if startFound and not re.match(r'^\s*$', line):
+			lirycs.append(line)
+		if re.search(beginPhrase, line, re.IGNORECASE):
+			#ucPrint("1st " + line)
+			if phFound:
+				#ucPrint("2st " + line)
+				startFound = True
+			phFound = True
+	return lirycs
+
 	
-webParsers = [["AZLyrics", getSongLyrics_AZLyrics],["tekst piosenki,", getSongLyrics_Tekstowo]]
+webParsers = [["AZLyrics", getSongLyrics_AZLyrics],
+["tekst piosenki,", getSongLyrics_Tekstowo],
+["Genius Lyrics",getSongLyrics_Genius]]
 			 
 def parseGoogleOutput(response, wName):
 	i = 0 
