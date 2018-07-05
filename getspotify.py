@@ -5,6 +5,8 @@ import sys
 from googlesearch.googlesearch import GoogleSearch
 from myprints import *
 
+
+
 def getSpotifyWindowName():
 	pids = enumProc.search('Spotify.exe')
 	for pid in pids:
@@ -14,22 +16,13 @@ def getSpotifyWindowName():
 	name = re.sub('- Edit$', '', name)
 	name = re.sub('- edit$', '', name)
 	name = re.sub('on Vimeo', '', name)
+	name = re.sub('\(With Sample\)', '', name)
 	return name
+
 
 def getGoogleSearchResult(phrase):	
 	ucPrint("Google search phrase: "+phrase)	
-	response = GoogleSearch().search(phrase)
-	i = 0 
-	print("Results:")
-	for result in response.results:
-		ucPrint(result.title)
-		if "AZLyrics" in result.title:
-			return response.results[i].getText()
-		if i > 10:
-			break
-		i = i + 1
-	print "No lyrics were found"
-	return None
+	return GoogleSearch().search(phrase)
 
 def getLine(text):
 	return iter(text.splitlines())
@@ -55,8 +48,40 @@ def getSongLyrics_AZLyrics(content, wName):
 				#print "2st", line 
 				startFound = True
 	return lirycs
-	
 
+def getSongLyrics_Tekstowo (content, wName):
+	lirycs = []
+	startFound = False
+	#ucPrint(content)
+	for line in getLine(content):
+		#ucPrint(line)
+		if re.search("Poznaj histori. zmian tego tekstu", line):
+			#print "end:" + line 
+			break;
+		if startFound and not re.match(r'^\s*$', line):
+			lirycs.append(line.lstrip())
+		if re.search("Tekst piosenki:", line):
+			#print "Tekst piosenki" + line
+			startFound = True
+	return lirycs
+
+	
+webParsers = [["AZLyrics", getSongLyrics_AZLyrics],["tekst piosenki,", getSongLyrics_Tekstowo]]
+			 
+def parseGoogleOutput(response, wName):
+	i = 0 
+	print("Results:")
+	for result in response.results:
+		ucPrint(result.title)
+		for parser in webParsers:
+			if parser[0] in result.title:
+				return parser[1](result.getText(),wName)
+		if i > 5:
+			break
+		i = i + 1
+	print "No lyrics were found"
+	return None
+	
 if __name__ == "__main__":
 	lastName = "HopfulyNonExistingSongTitle"
 	while (True):
@@ -65,15 +90,15 @@ if __name__ == "__main__":
 			if wName == "Spotify":
 				print "Currently no song is playing!"
 			else:
-				print 
-				print wName
+				ucPrint(wName)
 				content = getGoogleSearchResult(wName)
 				#ucPrint(content)
 				if content:
+					lirycs = parseGoogleOutput(content, wName)
 					print 
-					lirycs = getSongLyrics_AZLyrics(content, wName)
-					for ln in lirycs:
-						print ln
+					if lirycs:
+						for ln in lirycs:
+							ucPrint(ln)
 				print 
 			lastName = wName
 		time.sleep(5)
