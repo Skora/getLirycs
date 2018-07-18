@@ -88,7 +88,7 @@ def getSongLyrics_Genius (content, wName):
 
 	
 webParsers = [["AZLyrics", getSongLyrics_AZLyrics],
-["tekst piosenki,", getSongLyrics_Tekstowo],
+["tekst piosenki", getSongLyrics_Tekstowo],
 ["Genius Lyrics",getSongLyrics_Genius]]
 			 
 def parseGoogleOutput(response, wName):
@@ -102,8 +102,7 @@ def parseGoogleOutput(response, wName):
 		if i > 5:
 			break
 		i = i + 1
-	print "No lyrics were found"
-	return None
+	return "No lyrics were found"
 	
 if __name__ == "__main__":
 	lastName = "HopfulyNonExistingSongTitle"
